@@ -1,16 +1,15 @@
 from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-import os
+import os  # needed for PORT
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
-
+# -------------------------
+# Initialize Flask app
+# -------------------------
 app = Flask(__name__)
 
 # -------------------------
-# Load experimental data
+# Load your Excel data & train model
 # -------------------------
 data = pd.read_excel("test_results.xlsx")
 data["Grade"] = data["Grade"].str.replace("M","").astype(int)
@@ -20,7 +19,7 @@ model = LinearRegression()
 model.fit(X, y)
 
 # -------------------------
-# Base mix designs (kg/m3)
+# Base mix designs
 # -------------------------
 base_mix = {
     25: {"cement": 413, "FA": 690, "CA": 1127, "water": 186},
@@ -28,25 +27,23 @@ base_mix = {
 }
 
 def estimate_materials(grade, ggbs_percent, mk_percent):
-    # Interpolate for M20 & M40
-    if grade < 25:  # M20
+    if grade < 25:
         factor = grade/25
         base = base_mix[25]
-    elif grade > 30:  # M40
+    elif grade > 30:
         factor = grade/30
         base = base_mix[30]
-    elif grade == 25 or grade==30:
+    elif grade == 25 or grade == 30:
         factor = 1
         base = base_mix[grade]
-    else:  # in between M25 & M30
-        if grade<30:
+    else:
+        if grade < 30:
             factor = (grade-25)/5
             base = {k: base_mix[25][k]*(1-factor)+base_mix[30][k]*factor for k in base_mix[25]}
         else:
             factor = 1
             base = base_mix[30]
 
-    # Adjust cement for GGBS + MK
     total_binder = base["cement"]
     cement = total_binder * (1 - (ggbs_percent+mk_percent)/100)
     ggbs = total_binder * (ggbs_percent/100)
@@ -82,5 +79,9 @@ def index():
     return render_template("index.html", result=result, materials=materials,
                            grade=grade, ggbs=ggbs, mk=mk)
 
-if __name__=="__main__":
-    app.run(debug=True)
+# -------------------------
+# Run app on Render
+# -------------------------
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
