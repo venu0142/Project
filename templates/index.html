@@ -3,53 +3,119 @@
 <head>
     <title>AITS BATCH-9 PROJECT</title>
     <style>
-        body { font-family: Arial; margin: 50px; }
-        input, select { padding: 5px; margin: 5px; width: 150px; }
-        button { padding: 5px 10px; }
-        .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
-        table { margin-top: 20px; border-collapse: collapse; width: 400px; }
-        td, th { border: 1px solid #ccc; padding: 5px 10px; text-align: left; }
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 50px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 55%;
+        }
+
+        .logo {
+            width: 35%;
+            text-align: center;
+        }
+
+        .logo img {
+            width: 250px;
+        }
+
+        input, select {
+            padding: 8px;
+            margin: 8px 0;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
-    <h1>AITS BATCH-9 PROJECT - Concrete Strength & Material Calculator</h1>
-    <form method="POST">
-        <label>Grade:</label>
-        <select name="grade" required>
-            <option value="20">M20</option>
-            <option value="25">M25</option>
-            <option value="30">M30</option>
-            <option value="40">M40</option>
-        </select><br>
 
-        <label>GGBS (%):</label>
-        <input type="number" name="ggbs" step="0.1" required><br>
+<div class="container">
 
-        <label>Metakaolin (%):</label>
-        <input type="number" name="mk" step="0.1" required><br>
+    <div class="card">
+        <h2>AITS BATCH-9 PROJECT</h2>
 
-        <button type="submit">Predict</button>
-    </form>
+        <form method="POST">
 
-    {% if result %}
-    <div class="result">
-        <p>For <strong>Grade: M{{ grade }}</strong>, <strong>GGBS: {{ ggbs }}%</strong> and <strong>Metakaolin: {{ mk }}%</strong>,</p>
-        <p><strong>The Approximate Material Quantities (kg/m³) are:</strong></p>
+            <label>Grade:</label><br>
+            <select name="grade" required>
+                <option value="20">M20</option>
+                <option value="25">M25</option>
+                <option value="30">M30</option>
+                <option value="40">M40</option>
+            </select><br>
+
+            <label>Enter GGBS (10%–50%):</label><br>
+            <input type="number" name="ggbs" min="10" max="50" required><br>
+
+            <label>Enter Metakaolin (5%–30%):</label><br>
+            <input type="number" name="mk" min="5" max="30" required><br>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        {% if result %}
+        <h3>Results</h3>
+        <p><b>Predicted Strength:</b> {{ result }} MPa</p>
+
+        <h4>Approximate Material Quantities (kg/m³)</h4>
+        <table>
+            <tr><th>Material</th><th>Value</th></tr>
+            <tr><td>Cement</td><td>{{ materials.cement }}</td></tr>
+            <tr><td>GGBS</td><td>{{ materials.GGBS }}</td></tr>
+            <tr><td>Metakaolin</td><td>{{ materials.Metakaolin }}</td></tr>
+            <tr><td>FA</td><td>{{ materials.FA }}</td></tr>
+            <tr><td>CA</td><td>{{ materials.CA }}</td></tr>
+            <tr><td>Water</td><td>{{ materials.water }}</td></tr>
+        </table>
+        {% endif %}
+
     </div>
 
-    <table>
-        <tr><th>Material</th><th>Quantity (kg/m³)</th></tr>
-        <tr><td>Cement</td><td>{{ materials.cement }}</td></tr>
-        <tr><td>GGBS</td><td>{{ materials.GGBS }}</td></tr>
-        <tr><td>Metakaolin</td><td>{{ materials.Metakaolin }}</td></tr>
-        <tr><td>FA</td><td>{{ materials.FA }}</td></tr>
-        <tr><td>CA</td><td>{{ materials.CA }}</td></tr>
-        <tr><td>Water</td><td>{{ materials.water }}</td></tr>
-    </table>
-
-    <div class="result">
-        <p>Predicted Compressive Strength: <strong>{{ result }} MPa</strong></p>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}">
     </div>
-    {% endif %}
+
+</div>
+
 </body>
 </html>
