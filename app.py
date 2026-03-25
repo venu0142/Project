@@ -8,8 +8,10 @@ app = Flask(__name__)
 # Load data
 data = pd.read_excel("test_results.xlsx")
 data["Grade"] = data["Grade"].str.replace("M","").astype(int)
+
 X = data[["Grade","GGBS","Metakaolin"]]
 y = data["Strength"]
+
 model = LinearRegression()
 model.fit(X, y)
 
@@ -26,18 +28,12 @@ def estimate_materials(grade, ggbs_percent, mk_percent):
     elif grade > 30:
         factor = grade/30
         base = base_mix[30]
-    elif grade == 25 or grade == 30:
-        factor = 1
-        base = base_mix[grade]
     else:
-        if grade < 30:
-            factor = (grade-25)/5
-            base = {k: base_mix[25][k]*(1-factor)+base_mix[30][k]*factor for k in base_mix[25]}
-        else:
-            factor = 1
-            base = base_mix[30]
+        factor = 1
+        base = base_mix.get(grade, base_mix[25])
 
     total_binder = base["cement"]
+
     cement = total_binder * (1 - (ggbs_percent+mk_percent)/100)
     ggbs = total_binder * (ggbs_percent/100)
     mk = total_binder * (mk_percent/100)
@@ -56,18 +52,20 @@ def index():
     result = None
     materials = None
     error = None
-    grade = ggbs = mk = None
+    grade = None
+    ggbs = None
+    mk = None
 
     if request.method=="POST":
         grade = int(request.form["grade"])
         ggbs = float(request.form["ggbs"])
         mk = float(request.form["mk"])
 
-        # Validation
-        if not (10 <= ggbs <= 50):
-            error = "GGBS must be between 10% and 50%"
-        elif not (5 <= mk <= 30):
-            error = "Metakaolin must be between 5% and 30%"
+        # ✅ Validation
+        if not (0 <= ggbs <= 50):
+            error = "GGBS must be between 0% and 50%"
+        elif not (0 <= mk <= 30):
+            error = "Metakaolin must be between 0% and 30%"
         else:
             pred = model.predict([[grade, ggbs, mk]])[0]
             result = round(pred,2)
