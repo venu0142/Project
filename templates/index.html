@@ -5,8 +5,8 @@
     <style>
         body {
             font-family: Arial;
-            background-color: #f4f6f9;
             margin: 0;
+            background: #f4f6f8;
         }
 
         .container {
@@ -15,59 +15,52 @@
             padding: 40px;
         }
 
-        .card {
+        .form-box {
             background: white;
             padding: 25px;
             border-radius: 10px;
-            width: 55%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 50%;
         }
 
         .logo {
-            width: 35%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        img {
-            max-width: 100%;
-            border-radius: 10px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #2c3e50;
+            width: 250px;
         }
 
         input, select {
             width: 90%;
             padding: 8px;
-            margin: 8px 0;
+            margin: 10px 0;
         }
 
         button {
-            padding: 10px;
-            background: #2c3e50;
+            padding: 10px 15px;
+            background: #007BFF;
             color: white;
             border: none;
             cursor: pointer;
         }
 
-        table {
+        button:hover {
+            background: #0056b3;
+        }
+
+        .result {
             margin-top: 20px;
-            width: 100%;
+            background: #e9f7ef;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        table {
+            margin-top: 15px;
             border-collapse: collapse;
+            width: 100%;
         }
 
         td, th {
             border: 1px solid #ccc;
             padding: 8px;
-        }
-
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
         }
 
         .error {
@@ -79,40 +72,43 @@
 
 <body>
 
-<h1>AITS BATCH-9 PROJECT</h1>
-
 <div class="container">
 
-    <div class="card">
+    <!-- LEFT SIDE -->
+    <div class="form-box">
+        <h2>AITS BATCH-9 PROJECT</h2>
+        <h3>Concrete Strength Predictor</h3>
+
         <form method="POST">
 
-            <label>Grade:</label>
-            <select name="grade" required>
+            <label>Grade:</label><br>
+            <select name="grade">
                 <option value="20">M20</option>
                 <option value="25">M25</option>
                 <option value="30">M30</option>
                 <option value="40">M40</option>
-            </select>
+            </select><br>
 
-            <label>Enter GGBS (0% - 50%):</label>
-            <input type="number" name="ggbs" min="0" max="50" required>
+            <label>Enter GGBS (0% - 50%):</label><br>
+            <input type="number" name="ggbs" min="0" max="50" required><br>
 
-            <label>Enter Metakaolin (0% - 30%):</label>
-            <input type="number" name="mk" min="0" max="30" required>
+            <label>Enter Metakaolin (0% - 30%):</label><br>
+            <input type="number" name="mk" min="0" max="30" required><br>
 
-            <button type="submit">Calculate</button>
+            <button type="submit">Predict</button>
         </form>
 
         {% if error %}
-        <div class="error">{{ error }}</div>
+        <p class="error">{{ error }}</p>
         {% endif %}
 
         {% if result %}
         <div class="result">
-            <p>For given <strong>GGBS = {{ ggbs }}%</strong> and <strong>Metakaolin = {{ mk }}%</strong>:</p>
-            <p>Predicted Compressive Strength = {{ result }} MPa</p>
+            <p><b>For Given Grade M{{ grade }}, GGBS {{ ggbs }}% and Metakaolin {{ mk }}%:</b></p>
 
-            <p>Approximate Material Quantities (kg/m³):</p>
+            <p><b>Predicted Compressive Strength:</b> {{ result }} MPa</p>
+
+            <p><b>Approximate Material Quantities (kg/m³):</b></p>
 
             <table>
                 <tr><th>Material</th><th>Quantity</th></tr>
@@ -125,11 +121,11 @@
             </table>
         </div>
         {% endif %}
-
     </div>
 
-    <div class="logo">
-        <img src="{{ url_for('static', filename='logo.png') }}">
+    <!-- RIGHT SIDE LOGO -->
+    <div>
+        <img src="{{ url_for('static', filename='logo.jpeg') }}" class="logo">
     </div>
 
 </div>
